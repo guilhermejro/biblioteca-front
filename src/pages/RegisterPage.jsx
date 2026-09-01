@@ -34,7 +34,7 @@ function RegisterPage() {
                 <Link 
                     to="/login" 
                     style={{ 
-                        color: '#007bff', 
+                        color: '#83bfff', 
                         textDecoration: 'none', 
                         fontWeight: 'bold' 
                     }}

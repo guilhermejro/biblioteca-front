@@ -5,6 +5,8 @@ const baseURL = import.meta.env?.VITE_API_URL
   || process.env.EXPO_PUBLIC_API_URL         
   || 'http://localhost:3000';                
 
+console.log("✈️ URL ATUAL DO AXIOS:", baseURL);
+
 const api = axios.create({
     baseURL: baseURL, 
     timeout: 10000, 

@@ -32,7 +32,7 @@ function LoginPage() {
                 <Link 
                     to="/register" 
                     style={{ 
-                        color: '#007bff', 
+                        color: '#85bcf7', 
                         textDecoration: 'none', 
                         fontWeight: 'bold' 
                     }}
