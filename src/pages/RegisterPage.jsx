@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, Link } from "react-router-dom"; // Importado o Link para navegação
+import { useNavigate, Link } from "react-router-dom";
 import AuthForm from '../components/AuthForm';
 import { authService } from "../services/authService";
 
@@ -9,13 +9,15 @@ function RegisterPage() {
     const handleRegister = async (data) => {
         try {
             console.log("🚀 Dados enviados pelo formulário de registro:", data);
-            await authService.register(data); 
+            const response = await authService.register(data); 
             
-            alert('Cadastro realizado com sucesso! Agora faça seu login.');
+            const successMsg = response?.data?.message || response?.message || 'Cadastro realizado com sucesso! Agora faça seu login.';
+            alert(successMsg);
+            
             navigate('/login'); 
         } catch (error) {
             console.error("❌ Erro ao cadastrar:", error);
-            const backendMessage = error.response?.data?.error || error.response?.data?.message || 'Erro ao cadastrar usuário';
+            const backendMessage = error.response?.data?.message || error.response?.data?.error || 'Erro ao cadastrar usuário.';
             alert(`Erro no cadastro: ${backendMessage}`);
         }
     };

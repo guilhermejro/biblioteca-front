@@ -1,22 +1,131 @@
-.container {
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 30px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+.stage {
+    position: relative;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
 }
 
-.form { display: flex; flex-direction: column; gap: 15px; }
+/* Brilho da luminária de leitura */
+.lampGlow {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 180px;
+    background: radial-gradient(ellipse at top, rgba(212, 175, 55, 0.18) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none;
+    z-index: 0;
+}
 
-.inputGroup { display: flex; flex-direction: column; gap: 5px; }
+/* Orelha/Aba da Ficha Catalográfica */
+.tab {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    background: #e4d7be;
+    color: #4a3821;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    padding: 6px 20px;
+    border: 1px solid #c4b090;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    text-transform: uppercase;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+}
 
-.inputGroup label { font-weight: bold; color: #333; }
+/* Ficha principal */
+.container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 680px;
+    background: #f4ecd8; /* Tom de papel antigo */
+    border: 1px solid #c4b090;
+    border-radius: 4px;
+    padding: 30px 35px;
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        inset 0 0 40px rgba(180, 150, 100, 0.15);
+    box-sizing: border-box;
+}
 
-.inputGroup input, .inputGroup textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+/* Perfurações de arquivo no topo */
+.perf {
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    margin-bottom: 20px;
+}
+
+.perf span {
+    width: 12px;
+    height: 12px;
+    background: #241d12;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+    opacity: 0.85;
+}
+
+.title {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.4rem;
+    color: #3b2a1a;
+    text-align: center;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px dashed #c4b090;
+    padding-bottom: 12px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.label {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #5c4328;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.inputGroup input,
+.inputGroup textarea {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+    color: #2b1f13;
+    background: #faf6ed;
+    border: 1px solid #b8a280;
+    border-radius: 3px;
+    padding: 10px 12px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.inputGroup input:focus,
+.inputGroup textarea:focus {
+    outline: none;
+    border-color: #7a5227;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(122, 82, 39, 0.2);
 }
 
 .inputRow {
@@ -29,25 +138,72 @@
     display: flex;
     justify-content: flex-end;
     gap: 15px;
-    margin-top: 20px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px dashed #c4b090;
 }
 
 .btnSave {
-    background: #3498db;
-    color: white;
-    padding: 10px 25px;
-    border: none;
-    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    font-weight: bold;
+    background: #4a3420;
+    color: #f4ecd8;
+    padding: 12px 24px;
+    border: 1px solid #312113;
+    border-radius: 3px;
     cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btnSave:hover:not(:disabled) {
+    background: #61452a;
+}
+
+.btnSave:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btnCancel {
-    background: #e0e0e0;
-    color: #333;
-    padding: 10px 25px;
-    border: none;
-    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    font-weight: bold;
+    background: transparent;
+    color: #6b5238;
+    padding: 12px 20px;
+    border: 1px solid #b8a280;
+    border-radius: 3px;
     cursor: pointer;
+    transition: background 0.2s, color 0.2s;
 }
 
-.loading { text-align: center; margin-top: 50px; font-size: 1.2rem; }
+.btnCancel:hover {
+    background: #e4d7be;
+    color: #3b2a1a;
+}
+
+.loading {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    color: #8c7355;
+    margin-top: 60px;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 600px) {
+    .inputRow {
+        grid-template-columns: 1fr;
+    }
+    
+    .actions {
+        flex-direction: column-reverse;
+    }
+
+    .btnSave, .btnCancel {
+        width: 100%;
+        text-align: center;
+    }
+}

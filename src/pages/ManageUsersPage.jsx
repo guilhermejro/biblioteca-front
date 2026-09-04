@@ -9,7 +9,7 @@ function ManageUsersPage() {
     const [loading, setLoading] = useState(true);
     const [modalLoading, setModalLoading] = useState(false);
 
-    // --- ESTADOS PARA EDIÇÃO (Senha adicionada no objeto) ---
+    // --- ESTADOS PARA EDIÇÃO ---
     const [editingUser, setEditingUser] = useState(null); 
     const [editForm, setEditForm] = useState({ name: "", email: "", password: "" });
     const [editLoading, setEditLoading] = useState(false);
@@ -19,9 +19,13 @@ function ManageUsersPage() {
         try {
             setLoading(true);
             const response = await api.get("/users");
-            setUsers(response.data);
+            // Flexibiliza para res.data.users, res.data.data ou res.data como array direto
+            const usersList = response.data.users || response.data.data || (Array.isArray(response.data) ? response.data : []);
+            setUsers(usersList);
         } catch (error) {
-            alert(error.response?.data?.error || "Erro ao carregar lista de usuários.");
+            console.error("Erro ao carregar usuários:", error);
+            const errorMsg = error.response?.data?.message || "Erro ao carregar lista de usuários.";
+            alert(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -39,10 +43,12 @@ function ManageUsersPage() {
             setSelectedUserLoans([]); 
             
             const response = await api.get(`/loans`, { params: { member_id: id, limit: 100 } });
-            const loansList = response.data.loans || (Array.isArray(response.data) ? response.data : []);
+            const loansList = response.data.loans || response.data.data || (Array.isArray(response.data) ? response.data : []);
             setSelectedUserLoans(loansList);
         } catch (error) {
-            alert(error.response?.data?.error || "Erro ao buscar histórico.");
+            console.error("Erro ao buscar histórico:", error);
+            const errorMsg = error.response?.data?.message || "Erro ao buscar histórico.";
+            alert(errorMsg);
             setSelectedUserLoans(null);
         } finally {
             setModalLoading(false);
@@ -58,23 +64,26 @@ function ManageUsersPage() {
 
         try {
             const response = await api.put(`/users/${id}`, { role: newRole });
-            alert(response.data.message || "Cargo atualizado com sucesso!");
+            const successMsg = response.data?.message || "Cargo atualizado com sucesso!";
+            alert(successMsg);
             
             setUsers(prevUsers => 
                 prevUsers.map(user => user.id === id ? { ...user, role: newRole } : user)
             );
         } catch (error) {
-            alert(error.response?.data?.error || "Não foi possível atualizar o cargo do usuário.");
+            console.error("Erro ao atualizar cargo:", error);
+            const errorMsg = error.response?.data?.message || "Não foi possível atualizar o cargo do usuário.";
+            alert(errorMsg);
         }
     };
 
     // --- Abre o modal de edição limpando a senha por segurança ---
     const handleOpenEditModal = (user) => {
         setEditingUser(user);
-        setEditForm({ name: user.name, email: user.email, password: "" });
+        setEditForm({ name: user.name || "", email: user.email || "", password: "" });
     };
 
-    // --- Envia os dados atualizados para o backend (com tratamento para senha opcional) ---
+    // --- Envia os dados atualizados para o backend ---
     const handleSaveUserEdit = async (e) => {
         e.preventDefault();
         if (!editForm.name.trim() || !editForm.email.trim()) {
@@ -82,13 +91,11 @@ function ManageUsersPage() {
             return;
         }
 
-        // Monta o corpo da requisição padrão
         const payload = {
             name: editForm.name,
             email: editForm.email
         };
 
-        // Só envia o campo password se o bibliotecário digitou alguma coisa
         if (editForm.password.trim() !== "") {
             if (editForm.password.length < 6) {
                 alert("A nova senha deve ter pelo menos 6 caracteres.");
@@ -100,17 +107,19 @@ function ManageUsersPage() {
         try {
             setEditLoading(true);
             const response = await api.put(`/users/${editingUser.id}`, payload);
+            const successMsg = response.data?.message || "Usuário atualizado com sucesso!";
 
-            alert(response.data.message || "Usuário atualizado com sucesso! 🎉");
+            alert(successMsg);
 
-            // Atualiza o estado local para sincronizar a tabela imediatamente
             setUsers(prevUsers => 
                 prevUsers.map(user => user.id === editingUser.id ? { ...user, name: editForm.name, email: editForm.email } : user)
             );
             
-            setEditingUser(null); // Fecha o modal
+            setEditingUser(null);
         } catch (error) {
-            alert(error.response?.data?.error || "Não foi possível atualizar os dados do usuário.");
+            console.error("Erro ao atualizar usuário:", error);
+            const errorMsg = error.response?.data?.message || "Não foi possível atualizar os dados do usuário.";
+            alert(errorMsg);
         } finally {
             setEditLoading(false);
         }
@@ -122,10 +131,13 @@ function ManageUsersPage() {
 
         try {
             const response = await api.delete(`/users/${id}`);
-            alert(response.data.message || "Usuário removido com sucesso!");
+            const successMsg = response.data?.message || "Usuário removido com sucesso!";
+            alert(successMsg);
             setUsers(users.filter(user => user.id !== id));
         } catch (error) {
-            alert(error.response?.data?.error || "Não foi possível remover o usuário.");
+            console.error("Erro ao remover usuário:", error);
+            const errorMsg = error.response?.data?.message || "Não foi possível remover o usuário.";
+            alert(errorMsg);
         }
     };
 
@@ -148,7 +160,7 @@ function ManageUsersPage() {
                 <tbody>
                     {users.map((user) => (
                         <tr key={user.id}>
-                            <td>{user.id}</td>
+                            <td>#{String(user.id).padStart(3, '0')}</td>
                             <td>{user.name}</td>
                             <td>{user.email}</td>
                             <td>
@@ -201,7 +213,7 @@ function ManageUsersPage() {
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent}>
                         <h3>Editar Cadastro do Usuário</h3>
-                        <p className={styles.subtitle}>Alterando dados de ID: {editingUser.id}</p>
+                        <p className={styles.subtitle}>Alterando dados de ID: #{String(editingUser.id).padStart(3, '0')}</p>
                         
                         <form onSubmit={handleSaveUserEdit} className={styles.editForm}>
                             <div className={styles.formGroup}>
@@ -228,7 +240,6 @@ function ManageUsersPage() {
                                 />
                             </div>
 
-                            {/* 🔥 CAMPO DE SENHA OPCIONAL ADICIONADO AQUI */}
                             <div className={styles.formGroup}>
                                 <label htmlFor="edit-password">Nova Senha:</label>
                                 <input 
@@ -287,8 +298,8 @@ function ManageUsersPage() {
                                     </thead>
                                     <tbody>
                                         {selectedUserLoans.map((loan) => {
-                                            const bookTitle = loan.book_title || `Livro ID: ${loan.book_id}`;
-                                            const loanDate = loan.loan_date;
+                                            const bookTitle = loan.book?.title || loan.book_title || `Livro ID: ${loan.book_id}`;
+                                            const loanDate = loan.loan_date || loan.created_at;
                                             const statusLower = loan.status?.toLowerCase();
 
                                             return (

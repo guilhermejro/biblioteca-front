@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import styles from './CatalogoPage.module.css';
 
 function CatalogoPage() {
+    const navigate = useNavigate();
+
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -27,14 +29,15 @@ function CatalogoPage() {
                     }
                 });
 
-                const booksList = response.data.books || [];
-                const totalOfPages = response.data.totalPages || 1;
+                // Trata res.data.books, res.data.data (com paginação) ou res.data como array simples
+                const payload = response.data;
+                const booksList = payload.books || payload.data || (Array.isArray(payload) ? payload : []);
+                const totalOfPages = payload.totalPages || payload.pagination?.totalPages || 1;
 
                 setBooks(booksList);
                 setTotalPages(totalOfPages);
             } catch (error) {
                 console.error("Erro ao carregar livros:", error);
-                alert("Erro ao carregar o acervo.");
             } finally {
                 setLoading(false);
                 setUpdating(false);
@@ -80,7 +83,7 @@ function CatalogoPage() {
             <div className={`${styles.grid} ${updating ? styles.gridUpdating : ''}`}>
                 {books.length > 0 ? (
                     books.map((book, index) => (
-                        <div key={book.id} className={styles.card}>
+                        <div key={book.id || index} className={styles.card}>
                             {/* Perfuração no topo de cada ficha */}
                             <div className={styles.perf} aria-hidden="true">
                                 <span></span><span></span><span></span>
@@ -95,7 +98,7 @@ function CatalogoPage() {
                             <Link to={`/livro/${book.id}`} className={styles.detailsLink}>
                                 <div className={styles.imageWrapper}>
                                     <img
-                                        src={book.image_url || 'https://picsum.photos/seed/picsum/200/300'}
+                                        src={book.image_url || 'https://placehold.co/200x300/f4ecd8/241d12?text=Sem+Capa'}
                                         alt={book.title}
                                         onError={(e) => {
                                             e.target.onerror = null;
@@ -122,9 +125,10 @@ function CatalogoPage() {
                                     disabled={book.available === 0 || updating}
                                     onClick={(e) => {
                                         e.stopPropagation();
+                                        navigate(`/livro/${book.id}`);
                                     }}
                                 >
-                                    {book.available > 0 ? 'Solicitar Retirada' : 'Indisponível'}
+                                    {book.available > 0 ? 'Ver Detalhes / Solicitar' : 'Indisponível'}
                                 </button>
                             </div>
                         </div>
@@ -134,7 +138,7 @@ function CatalogoPage() {
                 )}
             </div>
 
-            {books.length > 0 && (
+            {books.length > 0 && totalPages > 1 && (
                 <div className={styles.paginationContainer}>
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}

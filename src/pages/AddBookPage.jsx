@@ -26,15 +26,21 @@ export default function AddBookPage() {
                 total_copies: Number(formData.total_copies)
             };
 
-            await api.post('/books', payload);
-            setMessage({ type: 'success', text: 'REGISTRO CATALOGADO COM SUCESSO' });
+            const response = await api.post('/books', payload);
+            
+            // Captura a mensagem padronizada do backend (res.data.message)
+            const successText = response.data?.message || 'REGISTRO CATALOGADO COM SUCESSO!';
+            setMessage({ type: 'success', text: successText });
             
             setFormData({ title: '', author: '', description: '', image_url: '', isbn: '', total_copies: 1 });
         } catch (error) {
             console.error(error);
+            
+            // Leitura ajustada para 'message' conforme o contrato da API
+            const errorText = error.response?.data?.message || 'FALHA NO CADASTRO. VERIFIQUE OS DADOS.';
             setMessage({ 
                 type: 'error', 
-                text: error.response?.data?.error || 'FALHA NO CADASTRO. VERIFIQUE OS DADOS.' 
+                text: errorText 
             });
         } finally {
             setLoading(false);
@@ -60,7 +66,7 @@ export default function AddBookPage() {
                     <Link to="/gerenciar-usuarios" className={styles.btnLinkSecondary}>
                         👥 Gerenciar Usuários
                     </Link>
-                    <Link to="/cadastrar-bibliotecario" className={styles.btnLinkSecondary}>
+                    <Link to="/admin/novo-bibliotecario" className={styles.btnLinkSecondary}>
                         👤 Cadastrar Bibliotecário
                     </Link>
                 </div>
@@ -75,12 +81,13 @@ export default function AddBookPage() {
 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.inputGroup}>
-                        <label className={styles.label}>TÍTULO DO OBRA</label>
+                        <label className={styles.label}>TÍTULO DA OBRA</label>
                         <input
                             type="text" 
                             required
                             placeholder="Nome completo do livro"
                             value={formData.title}
+                            disabled={loading}
                             onChange={e => setFormData({ ...formData, title: e.target.value })}
                         />
                     </div>
@@ -92,6 +99,7 @@ export default function AddBookPage() {
                             required
                             placeholder="Nome do autor ou entidade"
                             value={formData.author}
+                            disabled={loading}
                             onChange={e => setFormData({ ...formData, author: e.target.value })}
                         />
                     </div>
@@ -103,6 +111,7 @@ export default function AddBookPage() {
                                 type="text"
                                 placeholder="978-85-..."
                                 value={formData.isbn || ''} 
+                                disabled={loading}
                                 onChange={e => setFormData({ ...formData, isbn: e.target.value })}
                             />
                         </div>
@@ -114,6 +123,7 @@ export default function AddBookPage() {
                                 min="1" 
                                 required
                                 value={formData.total_copies}
+                                disabled={loading}
                                 onChange={e => setFormData({ ...formData, total_copies: e.target.value })}
                             />
                         </div>
@@ -125,6 +135,7 @@ export default function AddBookPage() {
                             type="text"
                             placeholder="https://exemplo.com/imagem.jpg"
                             value={formData.image_url}
+                            disabled={loading}
                             onChange={e => setFormData({ ...formData, image_url: e.target.value })}
                         />
                     </div>
@@ -135,6 +146,7 @@ export default function AddBookPage() {
                             rows="4"
                             placeholder="Resumo ou observações do acervo..."
                             value={formData.description}
+                            disabled={loading}
                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                         />
                     </div>

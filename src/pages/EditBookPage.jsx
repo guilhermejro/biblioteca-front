@@ -12,7 +12,7 @@ export default function EditBookPage() {
         author: '',
         description: '',
         image_url: '',
-        isbn: '', // 🔥 GARANTIDO: limpo de 'isnb' para bater com o banco
+        isbn: '',
         total_copies: 0,
         available: 0
     });
@@ -20,140 +20,148 @@ export default function EditBookPage() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
 
-    // 1. Carrega os dados originais do livro
     useEffect(() => {
         api.get(`/books/${id}`)
             .then(res => {
-                // 🔥 CORREÇÃO CRUCIAL: Se o banco trouxer chaves como null (ex: image_url ou description),
-                // o operador '||' garante que o React receba uma string vazia (''), 
-                // mantendo o input controlado e editável!
-                const livro = res.data;
+                const livro = res.data?.data || res.data;
                 setFormData({
                     title: livro.title || '',
                     author: livro.author || '',
                     description: livro.description || '',
                     image_url: livro.image_url || '',
                     isbn: livro.isbn || '',
-                    total_copies: livro.total_copies || 0,
-                    available: livro.available || 0
+                    total_copies: livro.total_copies ?? 0,
+                    available: livro.available ?? 0
                 });
                 setLoading(false);
             })
             .catch(err => {
                 console.error("Erro ao carregar livro:", err);
-                alert("Erro ao carregar dados do livro.");
+                const errorMsg = err.response?.data?.message || "Erro ao carregar dados do livro.";
+                alert(errorMsg);
                 navigate(-1);
             });
     }, [id, navigate]);
 
-    // 2. Envia as alterações
     const handleSubmit = async (e) => {
         e.preventDefault();
         setUpdating(true);
         try {
-            // 🔥 CORREÇÃO: Força a conversão de tipos para o Back-end não rejeitar a requisição
             const payload = {
                 title: formData.title,
                 author: formData.author,
                 description: formData.description,
-                image_url: formData.image_url.trim() === '' ? null : formData.image_url, // Se tiver vazio, envia null
+                image_url: formData.image_url.trim() === '' ? null : formData.image_url,
                 isbn: formData.isbn,
                 total_copies: Number(formData.total_copies),
                 available: Number(formData.available)
             };
 
-            await api.put(`/books/${id}`, payload);
-            alert('Livro atualizado com sucesso!');
-            navigate(`/books/${id}`); // Redireciona de volta para os detalhes do livro editado
+            const response = await api.put(`/books/${id}`, payload);
+            const successMsg = response.data?.message || 'Livro atualizado com sucesso!';
+            alert(successMsg);
+            
+            navigate(`/livro/${id}`);
         } catch (error) {
-            console.error(error);
-            alert(error.response?.data?.error || 'Erro ao atualizar livro.');
+            console.error("Erro ao atualizar livro:", error);
+            const errorMsg = error.response?.data?.message || 'Erro ao atualizar livro.';
+            alert(errorMsg);
         } finally {
             setUpdating(false);
         }
     };
 
-    if (loading) return <p className={styles.loading}>Carregando dados do livro...</p>;
+    if (loading) return <p className={styles.loading}>Localizando ficha no arquivo...</p>;
 
     return (
-        <div className={styles.container}>
-            <h2>Editar Livro</h2>
-            
-            <form onSubmit={handleSubmit} className={styles.form}>
-                <div className={styles.inputGroup}>
-                    <label>Título</label>
-                    <input 
-                        type="text" required
-                        value={formData.title}
-                        onChange={e => setFormData({...formData, title: e.target.value})}
-                    />
+        <div className={styles.stage}>
+            <div className={styles.lampGlow} aria-hidden="true"></div>
+
+            <div className={styles.tab}>ALTERAÇÃO DE REGISTRO</div>
+
+            <div className={styles.container}>
+                <div className={styles.perf} aria-hidden="true">
+                    <span></span><span></span><span></span>
                 </div>
 
-                <div className={styles.inputGroup}>
-                    <label>Autor</label>
-                    <input 
-                        type="text" required
-                        value={formData.author}
-                        onChange={e => setFormData({...formData, author: e.target.value})}
-                    />
-                </div>
-
-                <div className={styles.inputGroup}>
-                    <label>ISBN</label>
-                    <input 
-                        type="text"
-                        value={formData.isbn}
-                        onChange={e => setFormData({...formData, isbn: e.target.value})}
-                    />
-                </div>
-
-                <div className={styles.inputRow}>
+                <h2 className={styles.title}>Editar Livro #{String(id).padStart(4, '0')}</h2>
+                
+                <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.inputGroup}>
-                        <label>Total de Exemplares</label>
+                        <label className={styles.label}>Título da Obra</label>
                         <input 
-                            type="number" min="0"
-                            value={formData.total_copies}
-                            onChange={e => setFormData({...formData, total_copies: e.target.value})}
+                            type="text" required
+                            value={formData.title}
+                            onChange={e => setFormData({...formData, title: e.target.value})}
                         />
                     </div>
+
                     <div className={styles.inputGroup}>
-                        <label>Disponíveis</label>
+                        <label className={styles.label}>Autoria</label>
                         <input 
-                            type="number" min="0"
-                            value={formData.available}
-                            onChange={e => setFormData({...formData, available: e.target.value})}
+                            type="text" required
+                            value={formData.author}
+                            onChange={e => setFormData({...formData, author: e.target.value})}
                         />
                     </div>
-                </div>
 
-                <div className={styles.inputGroup}>
-                    <label>URL da Capa</label>
-                    <input 
-                        type="text"
-                        placeholder="https://exemplo.com/imagem.jpg"
-                        value={formData.image_url} // 🔥 Agora o valor está blindado contra null
-                        onChange={e => setFormData({...formData, image_url: e.target.value})}
-                    />
-                </div>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>Código ISBN</label>
+                        <input 
+                            type="text"
+                            value={formData.isbn}
+                            onChange={e => setFormData({...formData, isbn: e.target.value})}
+                        />
+                    </div>
 
-                <div className={styles.inputGroup}>
-                    <label>Descrição</label>
-                    <textarea 
-                        rows="5"
-                        value={formData.description}
-                        onChange={e => setFormData({...formData, description: e.target.value})}
-                    />
-                </div>
+                    <div className={styles.inputRow}>
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Total de Exemplares</label>
+                            <input 
+                                type="number" min="0"
+                                value={formData.total_copies}
+                                onChange={e => setFormData({...formData, total_copies: e.target.value})}
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Exemplares Disponíveis</label>
+                            <input 
+                                type="number" min="0"
+                                value={formData.available}
+                                onChange={e => setFormData({...formData, available: e.target.value})}
+                            />
+                        </div>
+                    </div>
 
-                <div className={styles.actions}>
-                    <button type="button" onClick={() => navigate(-1)} className={styles.btnCancel}>
-                        Cancelar
-                    </button>
-                    <button type="submit" disabled={updating} className={styles.btnSave}>
-                        {updating ? 'Salvando...' : 'Salvar Alterações'}
-                    </button>
-                </div>
-            </form>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>URL da Capa (Imagem)</label>
+                        <input 
+                            type="text"
+                            placeholder="https://exemplo.com/imagem.jpg"
+                            value={formData.image_url}
+                            onChange={e => setFormData({...formData, image_url: e.target.value})}
+                        />
+                    </div>
+
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>Descrição / Resenha</label>
+                        <textarea 
+                            rows="5"
+                            value={formData.description}
+                            onChange={e => setFormData({...formData, description: e.target.value})}
+                        />
+                    </div>
+
+                    <div className={styles.actions}>
+                        <button type="button" onClick={() => navigate(-1)} className={styles.btnCancel}>
+                            [ CANCELAR ]
+                        </button>
+                        <button type="submit" disabled={updating} className={styles.btnSave}>
+                            {updating ? 'ATUALIZANDO...' : '[ SALVAR ALTERAÇÕES ]'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

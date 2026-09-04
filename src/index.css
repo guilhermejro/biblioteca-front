@@ -1,10 +1,30 @@
 body {
   margin: 0;
+  padding: 0;
+  width: 100%;
   min-height: 100vh;
-  /* Fundo degradê escuro mantendo o ponto de iluminação da luminária verde */
+  /* Suporte para telas de celulares modernos com barras dinâmicas */
+  min-height: 100dvh; 
+  box-sizing: border-box;
+  overflow-x: hidden;
+
+  /* Gradiente com dimensões relativas (vw / %) para adaptar a qualquer resolução */
   background: 
-    radial-gradient(ellipse 900px 700px at 50% 8%, rgba(47, 143, 99, 0.16), transparent 60%),
-    radial-gradient(ellipse 1200px 900px at 50% 100%, #0f1a15 0%, #0c1310 55%);
+    radial-gradient(ellipse 80vw 60vh at 50% 8%, rgba(47, 143, 99, 0.18), transparent 65%),
+    radial-gradient(ellipse 120vw 100vh at 50% 100%, #0f1a15 0%, #0c1310 55%);
   background-attachment: fixed;
+  background-color: #0c1310; /* Fallback de cor base */
+
   color: #241d12;
+}
+
+/* Ajustes finos para telas menores (smartphones) */
+@media (max-width: 768px) {
+  body {
+    background: 
+      radial-gradient(ellipse 100vw 50vh at 50% 5%, rgba(47, 143, 99, 0.22), transparent 70%),
+      radial-gradient(ellipse 150vw 100vh at 50% 100%, #0f1a15 0%, #0c1310 60%);
+    /* Desativa fixed em telas móveis para evitar lag de scroll e bugs de renderização no iOS */
+    background-attachment: scroll; 
+  }
 }

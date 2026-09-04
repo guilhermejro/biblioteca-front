@@ -11,11 +11,15 @@ function RegisterLibrarian() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post('/auth/register-librarian', formData);
-            alert('Novo bibliotecário cadastrado com sucesso!');
+            const response = await api.post('/auth/register-librarian', formData);
+            const successMsg = response.data?.message || 'Novo bibliotecário cadastrado com sucesso!';
+            alert(successMsg);
+            
             setFormData({ name: '', email: '', password: '' });
         } catch (error) {
-            alert(error.response?.data?.error || 'Erro ao cadastrar. Você tem permissão de admin?');
+            console.error("Erro ao cadastrar bibliotecário:", error);
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Erro ao cadastrar. Você tem permissão de admin?';
+            alert(errorMsg);
         } finally {
             setLoading(false);
         }

@@ -29,22 +29,24 @@ function ProfilePage() {
 
                 const response = await loanService.listLoans(params);
 
-                const allLoans = response.loans || (Array.isArray(response) ? response : []);
+                // Trata formatos de retorno com envelope (loans/data) ou array direto
+                const allLoans = response?.loans || response?.data?.loans || response?.data || (Array.isArray(response) ? response : []);
 
                 let filteredLoans = [];
-                if (user.role?.toLowerCase() === 'librarian') {
+                if (user.role?.toLowerCase() === 'librarian' || user.role?.toLowerCase() === 'admin') {
                     filteredLoans = allLoans;
                 } else {
                     filteredLoans = allLoans.filter(loan => {
-                        const loanUserId = loan.member_id || loan.user_id || loan.userId;
+                        const loanUserId = loan.member_id || loan.user_id || loan.userId || loan.member?.id || loan.user?.id;
                         return String(loanUserId) === String(user.id);
                     });
                 }
 
                 setMyLoans(filteredLoans);
 
-                if (response.totalPages) {
-                    setHasMoreItems(currentPage < response.totalPages);
+                const totalPages = response?.totalPages || response?.data?.totalPages;
+                if (totalPages) {
+                    setHasMoreItems(currentPage < totalPages);
                 } else {
                     setHasMoreItems(allLoans.length >= limitPerPage);
                 }
@@ -66,6 +68,7 @@ function ProfilePage() {
         if (currentStatus === 'active') return <span className={`${styles.badge} ${styles.active}`}>EM DIA</span>;
         if (currentStatus === 'returned') return <span className={`${styles.badge} ${styles.returned}`}>DEVOLVIDO</span>;
         if (currentStatus === 'overdue') return <span className={`${styles.badge} ${styles.overdue}`}>EM ATRASO</span>;
+        if (currentStatus === 'rejected') return <span className={`${styles.badge} ${styles.rejected || styles.overdue}`}>RECUSADO</span>;
         return <span className={styles.badge}>{status?.toUpperCase()}</span>;
     };
 
@@ -75,7 +78,8 @@ function ProfilePage() {
 
         try {
             const response = await loanService.returnLoan(loanId);
-            alert(response.data?.message || response.message || "Devolução registrada com sucesso!");
+            const successMsg = response?.data?.message || response?.message || "Devolução registrada com sucesso!";
+            alert(successMsg);
 
             setMyLoans(prevLoans =>
                 prevLoans.map(loan =>
@@ -84,7 +88,8 @@ function ProfilePage() {
             );
         } catch (error) {
             console.error("Erro ao registrar devolução:", error);
-            alert(error.response?.data?.error || "Erro ao registrar devolução.");
+            const errorMsg = error.response?.data?.message || "Erro ao registrar devolução.";
+            alert(errorMsg);
         }
     };
 
@@ -142,14 +147,15 @@ function ProfilePage() {
                                 </thead>
                                 <tbody>
                                     {myLoans.map((loan) => {
-                                        const dataRetirada = loan.loan_date;
-                                        const dataDevolucao = loan.return_date;
-                                        const nomeUsuario = loan.user_name || `ID: ${loan.user_id || loan.member_id}`;
+                                        const bookTitle = loan.book_title || loan.book?.title || loan.Book?.title || `Livro ID: ${loan.book_id}`;
+                                        const dataRetirada = loan.loan_date || loan.created_at;
+                                        const dataDevolucao = loan.return_date || loan.due_date;
+                                        const nomeUsuario = loan.user_name || loan.member_name || loan.member?.name || loan.Member?.name || `ID: ${loan.user_id || loan.member_id}`;
                                         const currentStatus = loan.status?.toLowerCase();
 
                                         return (
                                             <tr key={loan.id} className={currentStatus === 'overdue' ? styles.overdueRow : ''}>
-                                                <td className={styles.bookTitle}>{loan.book_title}</td>
+                                                <td className={styles.bookTitle}>{bookTitle}</td>
 
                                                 {user.role === 'librarian' && <td>{nomeUsuario}</td>}
 

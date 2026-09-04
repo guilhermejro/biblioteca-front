@@ -18,6 +18,7 @@
   padding: 40px 20px 80px;
   font-family: 'Space Mono', monospace;
   color: var(--text);
+  box-sizing: border-box;
 }
 
 /* Brilho da luminária no topo */
@@ -25,7 +26,7 @@
   position: absolute;
   top: -40px;
   left: 50%;
-  width: 600px;
+  width: min(600px, 90vw);
   height: 180px;
   transform: translateX(-50%);
   background: radial-gradient(ellipse at center, rgba(47, 143, 99, 0.35), rgba(47, 143, 99, 0) 70%);
@@ -38,6 +39,7 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 40px;
+  width: 100%;
 }
 
 .tab {
@@ -61,6 +63,7 @@
   border-radius: 2px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   position: relative;
+  box-sizing: border-box;
 }
 
 .searchLabel {
@@ -82,6 +85,7 @@
   padding: 0.45rem 0.1rem;
   outline: none;
   transition: border-color 0.25s ease;
+  box-sizing: border-box;
 }
 
 .searchBar:focus {
@@ -101,12 +105,13 @@
   font-style: italic;
 }
 
-/* Grid de Fichas */
+/* Grid de Fichas (Consolidado) */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 24px;
   transition: opacity 0.2s ease;
+  width: 100%;
 }
 
 .gridUpdating {
@@ -124,6 +129,7 @@
   flex-direction: column;
   box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
 }
 
 .card:hover {
@@ -199,6 +205,7 @@
   color: var(--text);
   line-height: 1.2;
   margin-bottom: 0.4rem;
+  word-break: break-word;
 }
 
 .author {
@@ -207,6 +214,7 @@
   font-size: 0.85rem;
   color: var(--text-muted);
   margin-bottom: 0.8rem;
+  word-break: break-word;
 }
 
 .rule {
@@ -250,6 +258,7 @@
   cursor: pointer;
   transform: rotate(-0.4deg);
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .btnLoan:hover:not(:disabled) {
@@ -280,6 +289,7 @@
   align-items: center;
   gap: 1.5rem;
   margin-top: 50px;
+  flex-wrap: wrap;
 }
 
 .pageBtn {
@@ -290,6 +300,7 @@
   font-size: 0.85rem;
   cursor: pointer;
   transition: color 0.2s ease;
+  padding: 8px 12px;
 }
 
 .pageBtn:hover:not(:disabled) {
@@ -310,30 +321,36 @@
   color: var(--paper);
 }
 
-/* Grid com dimensionamento automático responsivo */
-.grid {
-  display: grid;
-  /* Cria colunas dinâmicas ajustando conforme o tamanho da tela */
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
+/* Regras Responsivas para Celulares e Tablets */
+@media (max-width: 640px) {
+  .stage {
+    padding: 20px 12px 60px;
+  }
 
-@media (max-width: 600px) {
   .grid {
-    grid-template-columns: 1fr; /* 1 coluna total no celular */
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .searchBox {
     padding: 1rem;
   }
 
+  .updatingText {
+    position: static;
+    display: block;
+    margin-top: 0.4rem;
+    text-align: right;
+  }
+
   .paginationContainer {
-    flex-direction: column;
     gap: 0.8rem;
+    flex-direction: column;
   }
 
   .pageBtn {
     width: 100%;
     text-align: center;
+    border: 1px dashed var(--paper-line);
   }
 }

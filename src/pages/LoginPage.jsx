@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthForm from '../components/AuthForm';
 import { AuthContext } from "../contexts/AuthContext";
@@ -7,26 +7,44 @@ function LoginPage() {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const hanldelogin = async (data) => {
+    // Estado da mensagem de feedback repassado ao AuthForm
+    const [flashMessage, setFlashMessage] = useState({ text: '', type: '' });
+
+    const handleLogin = async (data) => {
+        setFlashMessage({ text: '', type: '' });
+
         try {
             await login({ email: data.email, password: data.password });
-            alert('Login feito com sucesso!');
-            navigate('/catalogo');
-        } catch(error) {
-            alert('Erro ao fazer login. Verifique suas credenciais.');
+            
+            setFlashMessage({
+                text: 'Login feito com sucesso!',
+                type: 'success'
+            });
+
+            setTimeout(() => {
+                navigate('/catalogo');
+            }, 1000);
+
+        } catch (error) {
+            console.error("Erro no login:", error);
+            const errorMsg = error.response?.data?.message || 'Erro ao fazer login. Verifique suas credenciais.';
+            
+            setFlashMessage({
+                text: errorMsg,
+                type: 'error'
+            });
         }
     };
 
     return (
         <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
-            {/* O formulário precisa fechar com /> exatamente assim */}
             <AuthForm  
                 title="Acessar Biblioteca"
                 isRegister={false}
-                onSubmitButton={hanldelogin}
+                onSubmitButton={handleLogin}
+                flashMessage={flashMessage}
             />
             
-            {/* Bloco da âncora isolado dentro da div principal */}
             <div style={{ marginTop: '15px', textAlign: 'center', fontSize: '14px' }}>
                 <span>Não tem uma conta? </span>
                 <Link 

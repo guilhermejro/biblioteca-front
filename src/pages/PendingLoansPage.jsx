@@ -10,9 +10,12 @@ function PendingLoansPage() {
         try {
             setLoading(true);
             
-            const response = await loanService.listLoans({ page: 1, limit: 50 });
-            const allLoans = response.loans || (Array.isArray(response) ? response : []);
+            const response = await loanService.listLoans({ page: 1, limit: 100 });
             
+            // Trata formatos de retorno variados (response.loans, response.data.loans, response.data ou response)
+            const allLoans = response?.loans || response?.data?.loans || response?.data || (Array.isArray(response) ? response : []);
+            
+            // Filtra pendentes com verificação segura
             const pending = allLoans.filter(loan => 
                 loan.status?.toLowerCase() === 'pending'
             );
@@ -20,7 +23,8 @@ function PendingLoansPage() {
             setPendingLoans(pending);
         } catch (error) {
             console.error("Erro ao carregar reservas:", error);
-            alert("Não foi possível carregar a lista de reservas.");
+            const errorMsg = error.response?.data?.message || "Não foi possível carregar a lista de reservas.";
+            alert(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -36,12 +40,14 @@ function PendingLoansPage() {
         }
 
         try {
-            await loanService.approveLoan(loanId);
-            alert("Reserva aprovada e empréstimo ativado com sucesso!");
+            const response = await loanService.approveLoan(loanId);
+            const successMsg = response?.data?.message || response?.message || "Reserva aprovada e empréstimo ativado com sucesso!";
+            alert(successMsg);
+            
             setPendingLoans(prevLoans => prevLoans.filter(loan => loan.id !== loanId));
         } catch (error) {
             console.error("Erro ao aprovar:", error);
-            const msg = error.response?.data?.error || "Erro ao aprovar o empréstimo.";
+            const msg = error.response?.data?.message || "Erro ao aprovar o empréstimo.";
             alert(msg);
         }
     };
@@ -52,12 +58,14 @@ function PendingLoansPage() {
         }
 
         try {
-            await loanService.rejectLoan(loanId);
-            alert("Solicitação de reserva recusada com sucesso.");
+            const response = await loanService.rejectLoan(loanId);
+            const successMsg = response?.data?.message || response?.message || "Solicitação de reserva recusada com sucesso.";
+            alert(successMsg);
+            
             setPendingLoans(prevLoans => prevLoans.filter(loan => loan.id !== loanId));
         } catch (error) {
             console.error("Erro ao recusar reserva:", error);
-            const msg = error.response?.data?.error || "Erro ao recusar a reserva.";
+            const msg = error.response?.data?.message || "Erro ao recusar a reserva.";
             alert(msg);
         }
     };
@@ -99,43 +107,47 @@ function PendingLoansPage() {
                                     <th>CÓD.</th>
                                     <th>OBRA</th>
                                     <th>REQUISITANTE</th>
-                                    <th>DATA DA PEDIDO</th>
+                                    <th>DATA DO PEDIDO</th>
                                     <th className={styles.textCenter}>DESPACHO</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {pendingLoans.map((loan) => (
-                                    <tr key={loan.id} className={styles.tableRow}>
-                                        <td className={styles.tableCell}>#{String(loan.id).padStart(3, '0')}</td>
-                                        <td className={`${styles.tableCell} ${styles.bookTitle}`}>
-                                            {loan.book_title || loan.Book?.title || `Livro ID: ${loan.book_id}`}
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            {loan.user_name || loan.member_name || loan.Member?.name || `Membro ID: ${loan.member_id}`}
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            {loan.loan_date || loan.created_at || loan.createdAt 
-                                                ? new Date(loan.loan_date || loan.created_at || loan.createdAt).toLocaleDateString('pt-BR') 
-                                                : '---'}
-                                        </td>
-                                        <td className={`${styles.tableCell} ${styles.textCenter}`}>
-                                            <div className={styles.actionGroup}>
-                                                <button
-                                                    onClick={() => handleApprove(loan.id)}
-                                                    className={styles.approveButton}
-                                                >
-                                                    ✓ Aprovar
-                                                </button>
-                                                <button
-                                                    onClick={() => handleReject(loan.id)}
-                                                    className={styles.rejectButton}
-                                                >
-                                                    ✕ Recusar
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {pendingLoans.map((loan) => {
+                                    const bookTitle = loan.book_title || loan.book?.title || loan.Book?.title || `Livro ID: ${loan.book_id}`;
+                                    const memberName = loan.user_name || loan.member_name || loan.member?.name || loan.Member?.name || `Membro ID: ${loan.member_id}`;
+                                    const rawDate = loan.loan_date || loan.created_at || loan.createdAt;
+
+                                    return (
+                                        <tr key={loan.id} className={styles.tableRow}>
+                                            <td className={styles.tableCell}>#{String(loan.id).padStart(3, '0')}</td>
+                                            <td className={`${styles.tableCell} ${styles.bookTitle}`}>
+                                                {bookTitle}
+                                            </td>
+                                            <td className={styles.tableCell}>
+                                                {memberName}
+                                            </td>
+                                            <td className={styles.tableCell}>
+                                                {rawDate ? new Date(rawDate).toLocaleDateString('pt-BR') : '---'}
+                                            </td>
+                                            <td className={`${styles.tableCell} ${styles.textCenter}`}>
+                                                <div className={styles.actionGroup}>
+                                                    <button
+                                                        onClick={() => handleApprove(loan.id)}
+                                                        className={styles.approveButton}
+                                                    >
+                                                        ✓ Aprovar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(loan.id)}
+                                                        className={styles.rejectButton}
+                                                    >
+                                                        ✕ Recusar
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

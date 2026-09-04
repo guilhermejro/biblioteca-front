@@ -1,112 +1,130 @@
+/* CONTAINER PRINCIPAL */
 .container {
-    padding: 20px;
-    max-width: 1000px;
+    padding: 30px 20px;
+    max-width: 1050px;
     margin: 0 auto;
+    font-family: 'Courier New', Courier, monospace;
+    color: #e0e0e0;
 }
 
 .loading {
     text-align: center;
-    font-size: 18px;
+    font-size: 1.1rem;
     margin-top: 50px;
+    color: #ffb703;
+    letter-spacing: 2px;
 }
 
+/* TABELA ESTILIZADA DE GERENCIAMENTO */
 .table {
     width: 100%;
-    background-color: whitesmoke;
+    background-color: #121214;
     border-collapse: collapse;
-    margin-top: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-top: 25px;
+    border: 1px solid #333;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 .table th, .table td {
-    padding: 12px 15px;
+    padding: 14px 16px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #26262b;
 }
 
 .table th {
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #1a1a1e;
+    color: #83bfff;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #333;
 }
 
+.table tbody tr:hover {
+    background-color: #18181c;
+}
+
+/* BADGES DE PERMISSÃO / NIVEL */
 .badgeMember {
-    background-color: #e2e3e5;
-    color: #383d41;
+    background-color: #2a2a30;
+    color: #a0a0a0;
     padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    border: 1px solid #444;
+    letter-spacing: 1px;
 }
 
 .badgeStaff {
-    background-color: #cce5ff;
-    color: #004085;
+    background-color: #1b332b;
+    color: #00ff88;
     padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
+    border-radius: 2px;
+    font-size: 0.75rem;
     font-weight: bold;
+    border: 1px solid #00ff88;
+    letter-spacing: 1px;
 }
 
-/* GRUPO DE AÇÕES (Alinhamento dos botões na tabela) */
+/* GRUPO DE AÇÕES */
 .actionGroup {
     display: flex;
     gap: 8px;
-    justify-content: flex-start; /* Alinha os botões à esquerda na célula */
+    justify-content: flex-start;
+    align-items: center;
 }
 
-/* BOTÕES DA TABELA */
-.btnInfo {
-    background-color: #17a2b8;
-    color: white;
+/* BOTÕES DAS CÉLULAS */
+.btnInfo, .btnEdit, .btnToggleRole, .btnDelete {
     border: none;
     padding: 6px 12px;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+.btnInfo {
+    background-color: #1e3a5f;
+    color: #83bfff;
+    border: 1px solid #83bfff;
 }
 
 .btnEdit {
-    background-color: #f0ad4e;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    background-color: #3d2b00;
+    color: #ffb703;
+    border: 1px solid #ffb703;
 }
 
 .btnToggleRole {
-    background-color: #6f42c1; /* Roxo sutil para diferenciar da edição cadastral */
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    background-color: #2d1b4e;
+    color: #d69ade;
+    border: 1px solid #d69ade;
 }
 
 .btnDelete {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    background-color: #3f1015;
+    color: #ff5555;
+    border: 1px solid #ff5555;
 }
 
-.btnInfo:hover { background-color: #138496; }
-.btnEdit:hover { background-color: #ec971f; }
-.btnToggleRole:hover { background-color: #59359a; }
-.btnDelete:hover { background-color: #c82333; }
+.btnInfo:hover { background-color: #83bfff; color: #000; }
+.btnEdit:hover { background-color: #ffb703; color: #000; }
+.btnToggleRole:hover { background-color: #d69ade; color: #000; }
+.btnDelete:hover { background-color: #ff5555; color: #000; }
 
-/* MODAL STYLES (Geral) */
+/* ESTRUTURA DOS MODAIS */
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -114,115 +132,136 @@
 }
 
 .modalContent {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
+    background: #16161a;
+    padding: 30px;
+    border-radius: 4px;
     width: 90%;
-    max-width: 500px; /* Reduzido levemente para formulários de edição ficarem mais elegantes */
+    max-width: 520px;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    color: #e0e0e0;
 }
 
 .btnCloseModal {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: none;
+    background: transparent;
     border: none;
-    font-size: 16px;
+    color: #888;
+    font-size: 1.2rem;
     cursor: pointer;
+    transition: color 0.2s;
 }
 
-/* ELEMENTOS EXCLUSIVOS DO FORMULÁRIO DE EDIÇÃO */
+.btnCloseModal:hover {
+    color: #ff5555;
+}
+
+/* FORMULÁRIO DE EDIÇÃO INTERNO */
 .subtitle {
     font-size: 0.85rem;
-    color: #666;
-    margin-top: -8px;
-    margin-bottom: 20px;
+    color: #888;
+    margin-top: -6px;
+    margin-bottom: 22px;
 }
 
 .editForm {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
     text-align: left;
 }
 
 .formGroup {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .formGroup label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #333;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #ffb703;
+    letter-spacing: 1px;
 }
 
 .formGroup input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.95rem;
+    padding: 12px;
+    background-color: #0d0d0f;
+    border: 1px solid #333;
+    border-radius: 2px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
     transition: border-color 0.2s;
 }
 
 .formGroup input:focus {
-    border-color: #007bff;
+    border-color: #83bfff;
     outline: none;
+    box-shadow: 0 0 5px rgba(131, 191, 255, 0.3);
 }
 
 .formGroup input:disabled {
-    background-color: #e9ecef;
-    color: #6c757d;
+    background-color: #1a1a1e;
+    color: #666;
+    border-color: #222;
     cursor: not-allowed;
 }
 
 .modalActions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 12px;
+    margin-top: 15px;
 }
 
 .btnCancel {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 4px;
+    background-color: transparent;
+    color: #aaa;
+    border: 1px solid #444;
+    padding: 10px 18px;
+    border-radius: 2px;
     cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
 }
 
 .btnSave {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 4px;
+    background-color: #00ff88;
+    color: #000;
+    border: 1px solid #00ff88;
+    padding: 10px 18px;
+    border-radius: 2px;
     cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    transition: all 0.2s;
 }
 
-.btnCancel:hover { background-color: #5a6268; }
-.btnSave:hover { background-color: #218838; }
+.btnCancel:hover { background-color: #222; color: #fff; }
+.btnSave:hover { background-color: #00cc6d; box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); }
 
 .btnCancel:disabled, .btnSave:disabled {
-    opacity: 0.65;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
-/* HISTÓRICO DE EMPRÉSTIMOS (Dentro do Modal) */
+/* TABELA DE HISTÓRICO NO MODAL */
 .noLoans {
     margin-top: 20px;
-    color: #666;
+    color: #888;
     font-style: italic;
+    font-size: 0.9rem;
 }
 
 .modalTableContainer {
     margin-top: 20px;
-    max-height: 300px;
+    max-height: 280px;
     overflow-y: auto;
+    border: 1px solid #26262b;
 }
 
 .modalTable {
@@ -233,19 +272,27 @@
 .modalTable th, .modalTable td {
     padding: 10px;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #222;
+    font-size: 0.85rem;
+}
+
+.modalTable th {
+    background-color: #111;
+    color: #888;
+    position: sticky;
+    top: 0;
 }
 
 .statusActive {
-    color: #d39e00;
+    color: #ffb703;
     font-weight: bold;
 }
 
 .statusOverdue {
-    color: #dc3545;
+    color: #ff5555;
     font-weight: bold;
 }
 
 .statusReturned {
-    color: #28a745;
+    color: #00ff88;
 }

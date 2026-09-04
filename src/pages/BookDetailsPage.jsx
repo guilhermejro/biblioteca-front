@@ -22,7 +22,11 @@ export default function BookDetailsPage() {
     // 1. Busca os detalhes do livro ao montar o componente
     useEffect(() => {
         api.get(`/books/${id}`)
-            .then(res => setBook(res.data))
+            .then(res => {
+                // Trata o payload vindo direto ou encapsulado em res.data.data
+                const bookData = res.data?.data || res.data;
+                setBook(bookData);
+            })
             .catch(err => console.error("Erro ao buscar livro:", err));
     }, [id]);
 
@@ -37,7 +41,8 @@ export default function BookDetailsPage() {
         const delayDebounceFn = setTimeout(async () => {
             try {
                 const response = await api.get('/users');
-                const filtered = response.data.filter(u =>
+                const rawUsers = response.data?.data || response.data || [];
+                const filtered = rawUsers.filter(u =>
                     u.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
                 setUsersList(filtered);
@@ -54,11 +59,12 @@ export default function BookDetailsPage() {
         const confirmDelete = window.confirm("Tem certeza que deseja remover este livro do acervo?");
         if (confirmDelete) {
             try {
-                await api.delete(`/books/${id}`);
-                alert("Livro removido com sucesso!");
+                const response = await api.delete(`/books/${id}`);
+                const msg = response.data?.message || "Livro removido com sucesso!";
+                alert(msg);
                 navigate('/catalogo');
             } catch (err) {
-                const errorMsg = err.response?.data?.error || "Erro ao remover o livro.";
+                const errorMsg = err.response?.data?.message || "Erro ao remover o livro.";
                 alert(errorMsg);
                 console.error("Erro ao deletar:", err);
             }
@@ -90,12 +96,10 @@ export default function BookDetailsPage() {
                     return;
                 }
 
+                // Payload padronizado para a API (snake_case)
                 const payload = {
                     book_id: Number(id),
-                    bookId: Number(id),
-                    user_id: Number(selectedMemberId),
-                    userId: Number(selectedMemberId),
-                    member_id: Number(selectedMemberId)
+                    user_id: Number(selectedMemberId)
                 };
 
                 const response = await api.post('/loans', payload);
@@ -105,7 +109,8 @@ export default function BookDetailsPage() {
 
         } catch (err) {
             console.error(err);
-            alert(err.response?.data?.error || err.response?.data?.message || 'Erro ao processar a requisição.');
+            const errorMsg = err.response?.data?.message || 'Erro ao processar a requisição.';
+            alert(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -142,7 +147,7 @@ export default function BookDetailsPage() {
                             <div className={styles.metaItem}>
                                 <span>SITUAÇÃO</span>
                                 <b className={book.available > 0 ? styles.available : styles.unavailable}>
-                                    {book.available > 0 ? 'Disponível para Empréstimo' : 'Indisponível (Fila Activa)'}
+                                    {book.available > 0 ? 'Disponível para Empréstimo' : 'Indisponível (Fila Ativa)'}
                                 </b>
                             </div>
                             <div className={styles.metaItem}>
@@ -202,7 +207,7 @@ export default function BookDetailsPage() {
                         <div className={styles.buttonGroup}>
                             <button
                                 className={styles.btnLoan}
-                                disabled={loading || (isLibrarian && book.available <= 0)}
+                                disabled={loading || book.available <= 0}
                                 onClick={handleLoan}
                             >
                                 {loading ? 'PROCESSANDO...' : (
