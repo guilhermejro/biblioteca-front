@@ -1,96 +1,203 @@
-.container {
-  padding: 30px;
+:root {
+  --ink: #0c1310;
+  --lamp-dim: #1b5c42;
+  --paper: #f4ecd8;
+  --paper-line: #cbb992;
+  --text: #241d12;
+  --text-muted: #7c715a;
+  --alert-red: #8b2626;
+  --stamp-green: #1f6b48;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto;
+  padding: 40px 20px 80px;
+  font-family: 'Space Mono', monospace;
+  color: var(--text);
 }
 
-.title {
-  margin-bottom: 20px;
-  color: #333;
-  font-family: sans-serif;
+.lampGlow {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  width: 500px;
+  height: 180px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(47, 143, 99, 0.35), rgba(47, 143, 99, 0) 70%);
+  filter: blur(10px);
+  pointer-events: none;
 }
 
+/* Aba e Card do Arquivo */
+.tab {
+  width: fit-content;
+  background: var(--paper);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  padding: 6px 16px;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid var(--paper-line);
+  border-bottom: none;
+  margin-bottom: -1px;
+}
+
+.archiveCard {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  padding: 1.8rem;
+  border-radius: 2px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.perf {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.perf span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.8;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardHeader h2 {
+  font-family: 'Source Serif 4', serif;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.regNo {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.rule {
+  border: none;
+  border-top: 1px solid var(--paper-line);
+  margin: 1rem 0 1.2rem;
+}
+
+/* Estado Vazio e Carregamento */
 .emptyState {
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 5px;
+  padding: 3rem 1rem;
   text-align: center;
 }
 
-.emptyText {
-  margin: 0;
-  color: #6c757d;
-  font-size: 14px;
+.emptyText, .loading {
+  font-family: 'Source Serif 4', serif;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* Tabela e Envoltório Responsivo */
+.tableWrapper {
+  overflow-x: auto;
 }
 
 .tableContainer {
   width: 100%;
-  background-color: wheat;
   border-collapse: collapse;
-  margin-top: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  font-family: sans-serif;
+  font-size: 0.85rem;
 }
 
 .tableHeader {
-  background-color: #f1f3f5;
-  border-bottom: 2px solid #dee2e6;
-  text-align: left;
+  border-bottom: 2px solid var(--paper-line);
 }
 
 .tableHeader th {
-  padding: 12px;
-  color: #495057;
+  padding: 0.8rem 0.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .tableRow {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--paper-line);
   transition: background-color 0.2s;
 }
 
 .tableRow:hover {
-  background-color: #f8f9fa;
+  background-color: rgba(203, 185, 146, 0.2);
 }
 
 .tableCell {
-  padding: 12px;
-  color: #212529;
+  padding: 0.8rem 0.5rem;
+  color: var(--text);
 }
 
 .bookTitle {
-  font-weight: bold;
+  font-family: 'Source Serif 4', serif;
+  font-weight: 600;
 }
 
 .textCenter {
   text-align: center;
 }
 
-.approveButton {
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+/* Botões de Ação estilo carimbo/botão vintage */
+.actionGroup {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.approveButton, .rejectButton {
+  background: transparent;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.7rem;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.approveButton {
+  border: 1px solid var(--stamp-green);
+  color: var(--stamp-green);
 }
 
 .approveButton:hover {
-  background-color: #218838;
+  background-color: var(--stamp-green);
+  color: var(--paper);
 }
 
 .rejectButton {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s;
+  border: 1px solid var(--alert-red);
+  color: var(--alert-red);
 }
 
 .rejectButton:hover {
-    background-color: #c0392b;
+  background-color: var(--alert-red);
+  color: var(--paper);
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 600px) {
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  
+  .actionGroup {
+    flex-direction: column;
+    gap: 4px;
+  }
 }

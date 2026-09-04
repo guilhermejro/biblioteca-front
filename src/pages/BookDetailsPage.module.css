@@ -1,160 +1,308 @@
-.container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: 350px 1fr; /* Coluna da imagem fixa, o resto é info */
-    gap: 40px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+:root {
+  --ink: #0c1310;
+  --lamp-dim: #1b5c42;
+  --paper: #f4ecd8;
+  --paper-line: #cbb992;
+  --text: #241d12;
+  --text-muted: #7c715a;
+  --alert-red: #8b2626;
+  --stamp-green: #1f6b48;
 }
 
-.imageSection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+  font-family: 'Space Mono', monospace;
+  color: var(--text);
+}
+
+.lampGlow {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  width: 500px;
+  height: 180px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(47, 143, 99, 0.35), rgba(47, 143, 99, 0) 70%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.tab {
+  width: fit-content;
+  background: var(--paper);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  padding: 6px 16px;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid var(--paper-line);
+  border-bottom: none;
+  margin-bottom: -1px;
+}
+
+.bookCard {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  padding: 2rem;
+  border-radius: 2px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.perf {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.perf span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.8;
+}
+
+.layoutGrid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 30px;
 }
 
 .imageSection img {
-    width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    object-fit: cover;
-    aspect-ratio: 2/3;
+  width: 100%;
+  border: 1px solid var(--paper-line);
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.25);
+  object-fit: cover;
+  aspect-ratio: 2/3;
+  filter: sepia(0.12) contrast(1.02);
 }
 
 .infoSection {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-.infoSection h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin-bottom: 10px;
-    line-height: 1.2;
+.title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 1.8rem;
+  margin: 0 0 0.4rem 0;
+  color: var(--text);
+  line-height: 1.2;
 }
 
 .author {
-    font-size: 1.2rem;
-    color: #7f8c8d;
-    margin-bottom: 25px;
-}
-
-.description {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: #444;
-    margin-bottom: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
 }
 
 .metadata {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  padding: 1rem;
+  border: 1px dashed var(--paper-line);
+  margin-bottom: 1.5rem;
+  background: rgba(203, 185, 146, 0.12);
 }
 
 .metaItem {
-    font-size: 0.95rem;
-    color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
-.metaItem strong {
-    color: #2c3e50;
-    display: block;
-    margin-bottom: 4px;
+.metaItem span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
 }
 
-/* Status de Disponibilidade */
+.metaItem b {
+  font-size: 0.85rem;
+}
+
 .available {
-    color: #27ae60;
-    font-weight: bold;
+  color: var(--stamp-green);
 }
 
 .unavailable {
-    color: #e74c3c;
-    font-weight: bold;
+  color: var(--alert-red);
 }
 
-.btnLoan {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    align-self: flex-start; /* Não estica o botão */
+.description {
+  font-family: 'Source Serif 4', serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 1.5rem;
 }
 
-.btnLoan:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
+.searchContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
 }
 
-.btnLoan:disabled {
-    background-color: #bdc3c7;
-    cursor: not-allowed;
-    transform: none;
+.label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--paper-line);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+}
+
+.searchInput:focus {
+  border-bottom: 1px solid var(--lamp-dim);
+  background: rgba(203, 185, 146, 0.15);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 10;
+  max-height: 150px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+
+.dropdownItem {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--paper-line);
+  font-size: 0.8rem;
+}
+
+.dropdownItem:hover {
+  background: rgba(203, 185, 146, 0.3);
+}
+
+.memberId {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.noResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  padding: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  z-index: 10;
+}
+
+.rule {
+  border: none;
+  border-top: 1px solid var(--paper-line);
+  margin: 1.2rem 0;
 }
 
 .buttonGroup {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btnLoan {
+  background: transparent;
+  border: 1px solid var(--lamp-dim);
+  color: var(--lamp-dim);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnLoan:hover:not(:disabled) {
+  background: var(--lamp-dim);
+  color: var(--paper);
+}
+
+.btnLoan:disabled {
+  border-color: var(--paper-line);
+  color: var(--paper-line);
+  cursor: not-allowed;
+}
+
+.btnEdit, .btnDelete {
+  background: transparent;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btnEdit {
-    background-color: #f39c12; /* Cor Laranja */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
 }
 
 .btnEdit:hover {
-    background-color: #d35400;
+  background: var(--text-muted);
+  color: var(--paper);
 }
 
 .btnDelete {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #d9534f;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
+  border: 1px solid var(--alert-red);
+  color: var(--alert-red);
 }
 
 .btnDelete:hover {
-    background-color: #c9302c;
+  background: var(--alert-red);
+  color: var(--paper);
 }
-/* Responsividade para Celular */
+
+.loading {
+  text-align: center;
+  padding: 3rem 0;
+  font-family: 'Source Serif 4', serif;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
 @media (max-width: 768px) {
-    .container {
-        grid-template-columns: 1fr; /* Vira uma coluna só */
-        margin: 10px;
-        padding: 15px;
-    }
-
-    .imageSection img {
-        max-width: 250px; /* Reduz a imagem no celular */
-    }
-
-    .infoSection h1 {
-        font-size: 1.8rem;
-        margin-top: 20px;
-    }
+  .layoutGrid {
+    grid-template-columns: 1fr;
+  }
+  .imageSection img {
+    max-width: 200px;
+    margin: 0 auto display block;
+  }
+  .buttonGroup {
+    flex-direction: column;
+    width: 100%;
+  }
+  .btnLoan, .btnEdit, .btnDelete {
+    width: 100%;
+  }
 }

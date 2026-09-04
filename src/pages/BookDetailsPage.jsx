@@ -65,7 +65,6 @@ export default function BookDetailsPage() {
         }
     };
 
-    // ── 🔥 FUNÇÃO DE EMPRÉSTIMO / RESERVA CORRIGIDA ──────────────────────────
     const handleLoan = async () => {
         try {
             setLoading(true);
@@ -74,7 +73,7 @@ export default function BookDetailsPage() {
             if (user.role?.toLowerCase() === 'member') {
                 const payload = {
                     book_id: Number(id),
-                    days: 14 // Prazo padrão de reserva
+                    days: 14
                 };
 
                 const response = await api.post('/loans', payload);
@@ -112,158 +111,126 @@ export default function BookDetailsPage() {
         }
     };
 
-    if (!book) return <p className={styles.loading}>Carregando...</p>;
+    if (!book) return (
+        <div className={styles.stage}>
+            <p className={styles.loading}>Localizando registro no acervo...</p>
+        </div>
+    );
 
     const isLibrarian = user?.role?.toLowerCase() === 'librarian';
 
     return (
-        <div className={styles.container}>
-            <div className={styles.imageSection}>
-                <img src={book.image_url || 'https://placehold.co/400x600'} alt={book.title} />
-            </div>
+        <div className={styles.stage}>
+            <div className={styles.lampGlow} aria-hidden="true"></div>
 
-            <div className={styles.infoSection}>
-                <h1>{book.title}</h1>
-                <p className={styles.author}>por {book.author}</p>
-
-                <div className={styles.metadata}>
-                    <div className={styles.metaItem}>
-                        <strong>Status</strong>
-                        <span className={book.available > 0 ? styles.available : styles.unavailable}>
-                            {book.available > 0 ? 'Disponível para empréstimo' : 'Indisponível (Fila de Espera Ativa)'}
-                        </span>
-                    </div>
-                    <div className={styles.metaItem}>
-                        <strong>Exemplares</strong>
-                        <span>{book.available} unidades</span>
-                    </div>
+            <div className={styles.tab}>REGISTRO DE ACERVO</div>
+            <div className={styles.bookCard}>
+                <div className={styles.perf} aria-hidden="true">
+                    <span></span><span></span><span></span>
                 </div>
 
-                <div className={styles.description}>
-                    {book.description || "Nenhuma descrição disponível para este livro."}
-                </div>
+                <div className={styles.layoutGrid}>
+                    <div className={styles.imageSection}>
+                        <img src={book.image_url || 'https://placehold.co/400x600'} alt={book.title} />
+                    </div>
 
-                {/* CAMPO DE SELEÇÃO POR NOME (Apenas para o Librarian) */}
-                {isLibrarian && (
-                    <div style={{ marginBottom: '1.5rem', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontWeight: 'bold', color: '#4a5568' }}>Nome do Membro / Aluno:</label>
-                        <input
-                            type="text"
-                            placeholder="Digite o nome para buscar..."
-                            value={searchTerm}
-                            onChange={(e) => {
-                                setSearchTerm(e.target.value);
-                                setSelectedMemberId(''); 
-                            }}
-                            onFocus={() => searchTerm.length >= 2 && setShowDropdown(true)}
-                            style={{
-                                padding: '0.6rem',
-                                border: '1px solid #cbd5e0',
-                                borderRadius: '4px',
-                                width: '100%',
-                                maxWidth: '300px'
-                            }}
-                        />
+                    <div className={styles.infoSection}>
+                        <h1 className={styles.title}>{book.title}</h1>
+                        <p className={styles.author}>por <b>{book.author}</b></p>
 
-                        {/* Dropdown de sugestões */}
-                        {showDropdown && usersList.length > 0 && (
-                            <ul style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: '0',
-                                width: '100%',
-                                maxWidth: '300px',
-                                backgroundColor: '#fff',
-                                border: '1px solid #cbd5e0',
-                                borderRadius: '4px',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                                zIndex: 10,
-                                maxHeight: '150px',
-                                overflowY: 'auto',
-                                listStyle: 'none',
-                                padding: '0',
-                                margin: '4px 0 0 0'
-                            }}>
-                                {usersList.map((u) => (
-                                    <li
-                                        key={u.id}
-                                        onClick={() => {
-                                            setSelectedMemberId(u.id); 
-                                            setSearchTerm(u.name);     
-                                            setShowDropdown(false);    
-                                        }}
-                                        style={{
-                                            padding: '0.5rem 0.75rem',
-                                            cursor: 'pointer',
-                                            borderBottom: '1px solid #edf2f7',
-                                            color: '#2d3748',
-                                            backgroundColor: '#fff'
-                                        }}
-                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#f7fafc'}
-                                        onMouseLeave={(e) => e.target.style.backgroundColor = '#fff'}
-                                    >
-                                        {u.name} <span style={{ fontSize: '0.8rem', color: '#718096' }}>(ID: {u.id})</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        <div className={styles.metadata}>
+                            <div className={styles.metaItem}>
+                                <span>SITUAÇÃO</span>
+                                <b className={book.available > 0 ? styles.available : styles.unavailable}>
+                                    {book.available > 0 ? 'Disponível para Empréstimo' : 'Indisponível (Fila Activa)'}
+                                </b>
+                            </div>
+                            <div className={styles.metaItem}>
+                                <span>EXEMPLARES</span>
+                                <b>{book.available} Unidades</b>
+                            </div>
+                        </div>
 
-                        {/* Alerta de nenhum resultado encontrado */}
-                        {showDropdown && searchTerm.length >= 2 && usersList.length === 0 && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: '0',
-                                width: '100%',
-                                maxWidth: '300px',
-                                backgroundColor: '#fff',
-                                border: '1px solid #cbd5e0',
-                                padding: '0.5rem 0.75rem',
-                                color: '#718096',
-                                fontSize: '0.9rem',
-                                borderRadius: '4px',
-                                zIndex: 10
-                            }}>
-                                Nenhum usuário encontrado
+                        <div className={styles.description}>
+                            <p>{book.description || "Nenhuma resenha/descrição cadastrada para este volume."}</p>
+                        </div>
+
+                        {/* SELEÇÃO DE MEMBRO (Librarian) */}
+                        {isLibrarian && (
+                            <div className={styles.searchContainer}>
+                                <label className={styles.label}>LEITOR REQUISITANTE:</label>
+                                <input
+                                    type="text"
+                                    placeholder="Digite o nome para pesquisar..."
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setSelectedMemberId(''); 
+                                    }}
+                                    onFocus={() => searchTerm.length >= 2 && setShowDropdown(true)}
+                                    className={styles.searchInput}
+                                />
+
+                                {showDropdown && usersList.length > 0 && (
+                                    <ul className={styles.dropdown}>
+                                        {usersList.map((u) => (
+                                            <li
+                                                key={u.id}
+                                                onClick={() => {
+                                                    setSelectedMemberId(u.id); 
+                                                    setSearchTerm(u.name);     
+                                                    setShowDropdown(false);    
+                                                }}
+                                                className={styles.dropdownItem}
+                                            >
+                                                {u.name} <span className={styles.memberId}>(ID: #{String(u.id).padStart(3, '0')})</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+
+                                {showDropdown && searchTerm.length >= 2 && usersList.length === 0 && (
+                                    <div className={styles.noResults}>
+                                        Nenhum registro encontrado
+                                    </div>
+                                )}
                             </div>
                         )}
+
+                        <hr className={styles.rule} />
+
+                        <div className={styles.buttonGroup}>
+                            <button
+                                className={styles.btnLoan}
+                                disabled={loading || (isLibrarian && book.available <= 0)}
+                                onClick={handleLoan}
+                            >
+                                {loading ? 'PROCESSANDO...' : (
+                                    isLibrarian
+                                        ? '[ EFETIVAR EMPRÉSTIMO ]'
+                                        : '[ SOLICITAR LIVRO ]'
+                                )}
+                            </button>
+
+                            {isLibrarian && (
+                                <button
+                                    className={styles.btnEdit}
+                                    onClick={() => navigate(`/editar-livro/${id}`)}
+                                >
+                                    Editar
+                                </button>
+                            )}
+
+                            {isLibrarian && (
+                                <button
+                                    className={styles.btnDelete}
+                                    onClick={handleDelete}
+                                >
+                                    Remover
+                                </button>
+                            )}
+                        </div>
                     </div>
-                )}
-
-                <div className={styles.buttonGroup}>
-                    <button
-                        className={styles.btnLoan}
-                        /* 
-                          CORREÇÃO: O botão só fica desativado para o bibliotecário se o estoque for 0.
-                          Para o leitor comum, ele continua clicável mesmo se for 0, permitindo entrar na fila de reserva!
-                        */
-                        disabled={loading || (isLibrarian && book.available <= 0)}
-                        onClick={handleLoan}
-                    >
-                        {loading ? 'Processando...' : (
-                            isLibrarian
-                                ? 'Efetivar Empréstimo Físico'
-                                : 'Solicitar Livro (Entrar na Fila)'
-                        )}
-                    </button>
-
-                    {isLibrarian && (
-                        <button
-                            className={styles.btnDelete}
-                            onClick={handleDelete}
-                        >
-                            Remover Livro
-                        </button>
-                    )}
-
-                    {isLibrarian && (
-                        <button
-                            className={styles.btnEdit}
-                            onClick={() => navigate(`/editar-livro/${id}`)}
-                        >
-                            Editar Livro
-                        </button>
-                    )}
                 </div>
             </div>
         </div>

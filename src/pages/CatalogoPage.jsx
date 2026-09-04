@@ -6,19 +6,16 @@ import styles from './CatalogoPage.module.css';
 function CatalogoPage() {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [updating, setUpdating] = useState(false); // 🔥 Novo estado para transições suaves
+    const [updating, setUpdating] = useState(false);
     const [search, setSearch] = useState('');
 
-    // ── Estados para controle de Paginação ──────────────────────────────────
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1); // 🔥 Sincronizado com o seu backend
+    const [totalPages, setTotalPages] = useState(1);
     const limitPerPage = 50; 
 
-    // 1. Busca os livros no backend aplicando paginação e busca
     useEffect(() => {
         async function fetchBooks() {
             try {
-                // Se for a primeira carga, usa o loading principal. Se for paginação/busca, usa o updating.
                 if (books.length === 0) setLoading(true);
                 else setUpdating(true);
                 
@@ -30,7 +27,6 @@ function CatalogoPage() {
                     }
                 });
 
-                // Extrai os dados envelopados na estrutura que seu Model entrega
                 const booksList = response.data.books || [];
                 const totalOfPages = response.data.totalPages || 1;
 
@@ -41,7 +37,7 @@ function CatalogoPage() {
                 alert("Erro ao carregar o acervo.");
             } finally {
                 setLoading(false);
-                setUpdating(false); // 🔥 Desliga o indicador de transição
+                setUpdating(false);
             }
         }
 
@@ -55,33 +51,47 @@ function CatalogoPage() {
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
-        setCurrentPage(1); // Reseta para a página 1 ao buscar
+        setCurrentPage(1);
     };
 
-    // Loading principal: Só aparece na primeira abertura da página
-    if (loading) return <div className={styles.loading}>Carregando acervo...</div>;
+    if (loading) return <div className={styles.loading}>Consultando Arquivo...</div>;
 
     return (
-        <div className={styles.container}>
+        <div className={styles.stage}>
+            <div className={styles.lampGlow} aria-hidden="true"></div>
+
             <header className={styles.header}>
-                <h1>Acervo Borrachalioteca</h1>
-                <div className={styles.searchContainer}>
+                <div className={styles.tab}>CONSULTA AO ACERVO · 800</div>
+                
+                <div className={styles.searchBox}>
+                    <label htmlFor="search" className={styles.searchLabel}>Busca por Título ou Autor</label>
                     <input
+                        id="search"
                         type="text"
-                        placeholder="Pesquisar por título ou autor..."
+                        placeholder="Digite o termo para pesquisar..."
                         value={search}
                         onChange={handleSearchChange}
                         className={styles.searchBar}
                     />
-                    {/* Indicador visual discreto perto da busca de que o app está trabalhando */}
-                    {updating && <span className={styles.updatingText}>Atualizando...</span>}
+                    {updating && <span className={styles.updatingText}>Buscando ficha...</span>}
                 </div>
             </header>
 
             <div className={`${styles.grid} ${updating ? styles.gridUpdating : ''}`}>
                 {books.length > 0 ? (
-                    books.map(book => (
+                    books.map((book, index) => (
                         <div key={book.id} className={styles.card}>
+                            {/* Perfuração no topo de cada ficha */}
+                            <div className={styles.perf} aria-hidden="true">
+                                <span></span><span></span><span></span>
+                            </div>
+
+                            <div className={styles.cardHeader}>
+                                <span className={styles.regNo}>
+                                    REG. <b>#{String(book.id || index + 1).padStart(4, '0')}</b>
+                                </span>
+                            </div>
+
                             <Link to={`/livro/${book.id}`} className={styles.detailsLink}>
                                 <div className={styles.imageWrapper}>
                                     <img
@@ -89,7 +99,7 @@ function CatalogoPage() {
                                         alt={book.title}
                                         onError={(e) => {
                                             e.target.onerror = null;
-                                            e.target.src = 'https://placehold.co/200x300?text=Sem+Capa';
+                                            e.target.src = 'https://placehold.co/200x300/f4ecd8/241d12?text=Sem+Capa';
                                         }}
                                     />
                                 </div>
@@ -99,9 +109,11 @@ function CatalogoPage() {
                                 </div>
                             </Link>
 
+                            <hr className={styles.rule} />
+
                             <div className={styles.actions}>
                                 <p className={styles.status}>
-                                    Disponível: <span className={book.available > 0 ? styles.inStock : styles.outOfStock}>
+                                    Exemplares: <span className={book.available > 0 ? styles.inStock : styles.outOfStock}>
                                         {book.available} / {book.total_copies}
                                     </span>
                                 </p>
@@ -110,20 +122,18 @@ function CatalogoPage() {
                                     disabled={book.available === 0 || updating}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        // Lógica de empréstimo aqui
                                     }}
                                 >
-                                    {book.available > 0 ? 'Solicitar Empréstimo' : 'Indisponível'}
+                                    {book.available > 0 ? 'Solicitar Retirada' : 'Indisponível'}
                                 </button>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <p className={styles.empty}>Nenhum livro encontrado.</p>
+                    <p className={styles.empty}>Nenhuma ficha encontrada no acervo.</p>
                 )}
             </div>
 
-            {/* ── COMPONENTE DE PAGINAÇÃO CORRIGIDO ────────────────────────────────── */}
             {books.length > 0 && (
                 <div className={styles.paginationContainer}>
                     <button
@@ -131,11 +141,11 @@ function CatalogoPage() {
                         disabled={currentPage === 1 || updating}
                         className={styles.pageBtn}
                     >
-                        ◀ Anterior
+                        [ ◀ Ficha Anterior ]
                     </button>
 
                     <span className={styles.pageText}>
-                        Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
+                        Gaveta <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
                     </span>
 
                     <button
@@ -143,7 +153,7 @@ function CatalogoPage() {
                         disabled={currentPage >= totalPages || updating}
                         className={styles.pageBtn}
                     >
-                        Próxima ▶
+                        [ Próxima Ficha ▶ ]
                     </button>
                 </div>
             )}

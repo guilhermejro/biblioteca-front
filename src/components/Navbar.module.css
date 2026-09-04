@@ -1,34 +1,154 @@
+:root {
+  --ink: #0c1310;
+  --ink-2: #141f1a;
+  --lamp: #2f8f63;
+  --lamp-dim: #1b5c42;
+  --paper: #f4ecd8;
+  --paper-line: #cbb992;
+  --text: #241d12;
+  --text-muted: #7c715a;
+}
+
 .navbar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem 1rem;
-  background: #1E3A5F;
-  color: white;
-  gap: 10em;
+  padding: 0.8rem 2rem;
+  background-color: var(--ink-2);
+  border-bottom: 2px solid var(--lamp-dim);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  font-family: 'Space Mono', monospace;
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
-.logo {
-  text-decoration: none;
+.logo img {
+  width: 60px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  transition: transform 0.2s ease;
 }
-.links a {
-  padding: 0.5em;
-  color: white;
-  margin-right: 15px;
-  text-decoration: none;
 
+.logo img:hover {
+  transform: scale(1.05);
 }
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+/* Links em geral */
+.navLink {
+  color: var(--paper);
+  text-decoration: none;
+  font-size: 0.88rem;
+  letter-spacing: 0.03em;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  color: var(--lamp);
+  border-bottom-color: var(--lamp);
+}
+
+/* Destaque para links de Administrador/Bibliotecário */
+.adminLink {
+  color: #e2b96f;
+}
+
+.adminLink:hover {
+  color: #f3d498;
+  border-bottom-color: #e2b96f;
+}
+
+/* Badge do Usuário com efeito de carimbo/etiqueta */
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--paper);
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--paper-line);
+  border-radius: 2px;
+  color: var(--text);
+  margin-left: 0.5rem;
+}
+
+.welcome {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.welcome b {
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+/* Botão de Sair estilizado como ação de ficha */
 .btnLogout {
-  background: #e74c3c;
+  background: transparent;
   border: none;
-  margin-left: 10px;
-  margin-left: px;
-  padding: 200px;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
+  color: #a83232;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
+  padding: 0.1rem 0.3rem;
+  transition: color 0.2s ease;
+}
+
+.btnLogout:hover {
+  color: #e74c3c;
+  text-decoration: underline;
+}
+
+/* Botão de Cadastro (caso acesse deslogado) */
+.btnRegister {
+  background: transparent;
+  border: 1px solid var(--lamp);
+  color: var(--lamp);
+  padding: 0.4rem 0.8rem;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.btnRegister:hover {
+  background: var(--lamp);
+  color: var(--ink);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 0.8rem 1rem;
+    gap: 0.8rem;
+  }
+
+  .links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .navLink, .adminLink {
+    font-size: 0.8rem;
+    padding: 0.3rem;
+  }
+
+  .userBadge {
+    margin-left: 0;
+    margin-top: 0.4rem;
+    width: 100%;
+    justify-content: center;
+  }
 }

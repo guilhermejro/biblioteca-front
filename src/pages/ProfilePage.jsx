@@ -8,11 +8,8 @@ function ProfilePage() {
     const [myLoans, setMyLoans] = useState([]);
     const [loadingLoans, setLoadingLoans] = useState(true);
 
-    // ── Estados para controle de Paginação ──────────────────────────────────
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreItems, setHasMoreItems] = useState(false);
-
-    // 🔥 AJUSTE 1: Mudamos o limite da API para 5, batendo com o que você quer exibir na tela
     const limitPerPage = 10;
 
     useEffect(() => {
@@ -32,13 +29,7 @@ function ProfilePage() {
 
                 const response = await loanService.listLoans(params);
 
-                // 🔍 INSPEÇÃO MANUAL: Abre o console do navegador (F12) para ver esses logs!
-                console.log("=== DEBUG PAGINAÇÃO ===");
-                console.log("Resposta bruta do backend:", response);
-
                 const allLoans = response.loans || (Array.isArray(response) ? response : []);
-                console.log("Quantidade de registros encontrados (allLoans.length):", allLoans.length);
-                console.log("Limite por página esperado no front (limitPerPage):", limitPerPage);
 
                 let filteredLoans = [];
                 if (user.role?.toLowerCase() === 'librarian') {
@@ -53,14 +44,10 @@ function ProfilePage() {
                 setMyLoans(filteredLoans);
 
                 if (response.totalPages) {
-                    console.log("Backend enviou totalPages:", response.totalPages);
                     setHasMoreItems(currentPage < response.totalPages);
                 } else {
-                    console.log("Backend não enviou totalPages. Usando fallback de tamanho.");
                     setHasMoreItems(allLoans.length >= limitPerPage);
                 }
-                console.log("Resultado final -> O botão Próxima deve ficar ativo? ", allLoans.length >= limitPerPage || (response.totalPages && currentPage < response.totalPages));
-                console.log("=======================");
 
             } catch (error) {
                 console.error("Erro ao buscar histórico de empréstimos:", error);
@@ -75,11 +62,11 @@ function ProfilePage() {
 
     const renderStatusBadge = (status) => {
         const currentStatus = status?.toLowerCase();
-        if (currentStatus === 'pending') return <span className={`${styles.badge} ${styles.pending}`}>Pendente</span>;
-        if (currentStatus === 'active') return <span className={`${styles.badge} ${styles.active}`}>Ativo</span>;
-        if (currentStatus === 'returned') return <span className={`${styles.badge} ${styles.returned}`}>Devolvido</span>;
-        if (currentStatus === 'overdue') return <span className={`${styles.badge} ${styles.overdue}`}>Atrasado ⚠️</span>;
-        return <span className={styles.badge}>{status}</span>;
+        if (currentStatus === 'pending') return <span className={`${styles.badge} ${styles.pending}`}>PENDENTE</span>;
+        if (currentStatus === 'active') return <span className={`${styles.badge} ${styles.active}`}>EM DIA</span>;
+        if (currentStatus === 'returned') return <span className={`${styles.badge} ${styles.returned}`}>DEVOLVIDO</span>;
+        if (currentStatus === 'overdue') return <span className={`${styles.badge} ${styles.overdue}`}>EM ATRASO</span>;
+        return <span className={styles.badge}>{status?.toUpperCase()}</span>;
     };
 
     const handleReturnLoan = async (loanId) => {
@@ -101,78 +88,95 @@ function ProfilePage() {
         }
     };
 
-    if (!user) return <p className={styles.loading}>Carregando perfil...</p>;
+    if (!user) return <p className={styles.loading}>Localizando ficha do leitor...</p>;
 
     return (
-        <div className={styles.container}>
+        <div className={styles.stage}>
+            <div className={styles.lampGlow} aria-hidden="true"></div>
+
+            {/* Cartão de Perfil do Usuário */}
+            <div className={styles.tab}>REGISTRO DE MATRÍCULA</div>
             <div className={styles.profileCard}>
-                <h2>Meu Perfil</h2>
-                <p><strong>Nome:</strong> {user.name}</p>
-                <p><strong>E-mail:</strong> {user.email}</p>
-                <p><strong>Cargo:</strong> {user.role === 'librarian' ? 'Bibliotecário' : 'Leitor'}</p>
+                <div className={styles.perf} aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </div>
+                <div className={styles.cardHeader}>
+                    <h2>Ficha do Leitor</h2>
+                    <span className={styles.regNo}>MATRÍCULA <b>#{String(user.id || '1').padStart(4, '0')}</b></span>
+                </div>
+                <hr className={styles.rule} />
+                <div className={styles.profileDetails}>
+                    <p><span>NOME:</span> <b>{user.name}</b></p>
+                    <p><span>CORREIO:</span> <b>{user.email}</b></p>
+                    <p><span>CATEGORIA:</span> <b>{user.role === 'librarian' ? 'Bibliotecário' : 'Leitor'}</b></p>
+                </div>
             </div>
 
+            {/* Seção da Tabela de Empréstimos */}
             <div className={styles.loansSection}>
-                <h3>
-                    {user.role === 'librarian' ? '📋 Painel Geral de Empréstimos & Reservas' : '📚 Meus Empréstimos & Reservas'}
-                </h3>
+                <div className={styles.sectionHeader}>
+                    <h3>
+                        {user.role === 'librarian' ? '📋 Painel Geral de Empréstimos & Reservas' : '📚 Livros em Posse & Histórico'}
+                    </h3>
+                </div>
 
                 {loadingLoans ? (
-                    <p className={styles.loading}>Carregando histórico...</p>
+                    <p className={styles.loading}>Consultando livros registrados...</p>
                 ) : myLoans.length === 0 ? (
                     <p className={styles.emptyText}>
-                        {user.role === 'librarian' ? 'Nenhum empréstimo registrado no sistema.' : 'Você ainda não solicitou nenhum livro.'}
+                        {user.role === 'librarian' ? 'Nenhum empréstimo registrado no sistema.' : 'Nenhum registro encontrado nesta ficha.'}
                     </p>
                 ) : (
                     <>
-                        <table className={styles.loansTable}>
-                            <thead>
-                                <tr>
-                                    <th>Livro</th>
-                                    {user.role === 'librarian' && <th>Usuário</th>}
-                                    <th>Data de Retirada</th>
-                                    <th>Prazo de Devolução</th>
-                                    <th>Status</th>
-                                    {user.role === 'librarian' && <th>Ações</th>}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {/* 🔥 AJUSTE 2: MAPEANDO DIRETO O 'myLoans' SEM FAZER SLICE NO FRONT */}
-                                {myLoans.map((loan) => {
-                                    const dataRetirada = loan.loan_date;
-                                    const dataDevolucao = loan.return_date;
-                                    const nomeUsuario = loan.user_name || `ID: ${loan.user_id || loan.member_id}`;
-                                    const currentStatus = loan.status?.toLowerCase();
+                        <div className={styles.tableWrapper}>
+                            <table className={styles.loansTable}>
+                                <thead>
+                                    <tr>
+                                        <th>OBRA</th>
+                                        {user.role === 'librarian' && <th>LEITOR</th>}
+                                        <th>RETIRADA</th>
+                                        <th>DEVOLUÇÃO</th>
+                                        <th>SITUAÇÃO</th>
+                                        {user.role === 'librarian' && <th>AÇÕES</th>}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {myLoans.map((loan) => {
+                                        const dataRetirada = loan.loan_date;
+                                        const dataDevolucao = loan.return_date;
+                                        const nomeUsuario = loan.user_name || `ID: ${loan.user_id || loan.member_id}`;
+                                        const currentStatus = loan.status?.toLowerCase();
 
-                                    return (
-                                        <tr key={loan.id} className={currentStatus === 'overdue' ? styles.overdueRow : ''}>
-                                            <td className={styles.bookTitle}>{loan.book_title}</td>
+                                        return (
+                                            <tr key={loan.id} className={currentStatus === 'overdue' ? styles.overdueRow : ''}>
+                                                <td className={styles.bookTitle}>{loan.book_title}</td>
 
-                                            {user.role === 'librarian' && <td>{nomeUsuario}</td>}
+                                                {user.role === 'librarian' && <td>{nomeUsuario}</td>}
 
-                                            <td>{dataRetirada ? new Date(dataRetirada).toLocaleDateString('pt-BR') : '---'}</td>
-                                            <td>{dataDevolucao ? new Date(dataDevolucao).toLocaleDateString('pt-BR') : '---'}</td>
-                                            <td>{renderStatusBadge(loan.status)}</td>
+                                                <td>{dataRetirada ? new Date(dataRetirada).toLocaleDateString('pt-BR') : '---'}</td>
+                                                <td>{dataDevolucao ? new Date(dataDevolucao).toLocaleDateString('pt-BR') : '---'}</td>
+                                                <td>{renderStatusBadge(loan.status)}</td>
 
-                                            {user.role === 'librarian' && (
-                                                <td>
-                                                    {currentStatus === 'active' || currentStatus === 'overdue' ? (
-                                                        <button
-                                                            className={styles.returnBtn}
-                                                            onClick={() => handleReturnLoan(loan.id)}
-                                                        >
-                                                            ↩ Devolver
-                                                        </button>
-                                                    ) : (
-                                                        <span className={styles.disabledText}>Sem ações</span>
-                                                    )}
-                                                </td>
-                                            )}
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                                                {user.role === 'librarian' && (
+                                                    <td>
+                                                        {currentStatus === 'active' || currentStatus === 'overdue' ? (
+                                                            <button
+                                                                className={styles.returnBtn}
+                                                                onClick={() => handleReturnLoan(loan.id)}
+                                                            >
+                                                                ↩ Devolver
+                                                            </button>
+                                                        ) : (
+                                                            <span className={styles.disabledText}>Sem ações</span>
+                                                        )}
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div className={styles.paginationContainer}>
                             <button
@@ -180,11 +184,11 @@ function ProfilePage() {
                                 disabled={currentPage === 1}
                                 className={styles.pageBtn}
                             >
-                                ◀ Anterior
+                                [ ◀ Página Anterior ]
                             </button>
 
                             <span className={styles.pageText}>
-                                Página <strong>{currentPage}</strong>
+                                Folha <strong>{currentPage}</strong>
                             </span>
 
                             <button
@@ -192,7 +196,7 @@ function ProfilePage() {
                                 disabled={!hasMoreItems}
                                 className={styles.pageBtn}
                             >
-                                Próxima ▶
+                                [ Próxima Página ▶ ]
                             </button>
                         </div>
                     </>

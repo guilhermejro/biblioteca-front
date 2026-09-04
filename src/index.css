@@ -1,9 +1,10 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    #000000,
-    #3b82f6
-  );
+  /* Fundo degradê escuro mantendo o ponto de iluminação da luminária verde */
+  background: 
+    radial-gradient(ellipse 900px 700px at 50% 8%, rgba(47, 143, 99, 0.16), transparent 60%),
+    radial-gradient(ellipse 1200px 900px at 50% 100%, #0f1a15 0%, #0c1310 55%);
+  background-attachment: fixed;
+  color: #241d12;
 }
